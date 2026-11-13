@@ -1,0 +1,6 @@
+{
+  "name": "Sky Ascent 3D",
+  "description": "الصعود المستحيل 3D — لعبة تسلق باركور ثلاثية الأبعاد ببطولة يد سايبرانية مفصلية عبر 1000 متر من البيئات السماوية والفضائية.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
