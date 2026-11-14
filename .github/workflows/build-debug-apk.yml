@@ -24,45 +24,60 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Setup Java 17
+      - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Setup Gradle 9.3.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
+
+      - name: Prepare debug keystore
+        run: |
+          if [ -f "debug.keystore.base64" ]; then
+            base64 -d debug.keystore.base64 > debug.keystore
+          elif [ ! -f "debug.keystore" ]; then
+            keytool -genkeypair -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
       - name: Install dependencies and build web bundle
         run: |
-          npm install
+          npm ci || npm install
           npm run build
 
-      - name: Sync web assets to Android & Capacitor
+      - name: Sync web assets to Android
         run: |
           rm -rf app/src/main/assets/public
           mkdir -p app/src/main/assets/public
           cp -r dist/* app/src/main/assets/public/
-          if [ -d "android" ]; then
-            npx cap sync android
-          fi
 
       - name: Build Debug APK
         run: |
-          if [ -d "android" ]; then
-            cd android && chmod +x gradlew && ./gradlew assembleDebug
-            cp app/build/outputs/apk/debug/app-debug.apk ../debug/debug.apk
-          else
-            gradle assembleDebug
-            cp app/build/outputs/apk/debug/app-debug.apk debug/debug.apk
-          fi
+          mkdir -p debug
+          gradle assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk debug/debug.apk
+
+      - name: Upload Debug APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: immortal-hand-3d-debug-apk
+          path: debug/debug.apk
 
       - name: Commit debug/debug.apk
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -- package-lock.json app/src/main/assets/public 2>/dev/null || true
+          git clean -fd app/src/main/assets/public 2>/dev/null || true
           git add -f debug/debug.apk
           if ! git diff --cached --quiet; then
             git commit -m "chore: update debug/debug.apk [skip ci]"
-            git push
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            git push || echo "Skipping git push (check branch protection/permissions); APK is available in job artifacts."
           fi

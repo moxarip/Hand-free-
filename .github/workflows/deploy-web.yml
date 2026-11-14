@@ -30,9 +30,12 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
       - name: Install and build
         run: |
-          npm install
+          npm ci || npm install
           npm run build
 
       - name: Upload artifact
