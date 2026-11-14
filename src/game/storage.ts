@@ -1,83 +1,64 @@
-import { HandSkinId, SaveData, SettingsData, ThrusterColorId } from '../types/game';
+import { RelicSkinId, SaveData, SettingsData } from '../types/game';
 
-const STORAGE_KEY = 'sky_ascent_3d_save_v1';
+const STORAGE_KEY = 'immortal_hand_3d_save_v1';
 
-export interface HandSkinPreset {
-  id: HandSkinId;
+export interface RelicSkinPreset {
+  id: RelicSkinId;
   labelAr: string;
-  primaryColor: string;
-  secondaryColor: string;
-  wireColor: string;
-  conduitGlow: string;
+  armorHex: string;
+  trimHex: string;
+  veinHex: string;
+  flameCoreHex: string;
+  flameOuterHex: string;
   metalness: number;
   roughness: number;
-  clearcoat: number;
-  useCarbonTexture: boolean;
 }
 
-export const HAND_SKINS: Record<HandSkinId, HandSkinPreset> = {
-  cyber_steel: {
-    id: 'cyber_steel',
-    labelAr: 'فولاذ سيبراني',
-    primaryColor: '#b8c4d4',
-    secondaryColor: '#263244',
-    wireColor: '#d97706',
-    conduitGlow: '#00e5ff',
+export const RELIC_SKINS: Record<RelicSkinId, RelicSkinPreset> = {
+  immortal_gold: {
+    id: 'immortal_gold',
+    labelAr: 'الذهب الخالد',
+    armorHex: '#241e18',
+    trimHex: '#eab308',
+    veinHex: '#fde047',
+    flameCoreHex: '#fffbeb',
+    flameOuterHex: '#f59e0b',
     metalness: 0.88,
-    roughness: 0.24,
-    clearcoat: 0.55,
-    useCarbonTexture: false,
-  },
-  gold_titanium: {
-    id: 'gold_titanium',
-    labelAr: 'تيتانيوم ذهبي',
-    primaryColor: '#eab308',
-    secondaryColor: '#292218',
-    wireColor: '#fb7185',
-    conduitGlow: '#fef08a',
-    metalness: 0.92,
-    roughness: 0.2,
-    clearcoat: 0.75,
-    useCarbonTexture: false,
-  },
-  black_carbon: {
-    id: 'black_carbon',
-    labelAr: 'كربون أسود',
-    primaryColor: '#1e2430',
-    secondaryColor: '#0c0f16',
-    wireColor: '#ef4444',
-    conduitGlow: '#10b981',
-    metalness: 0.52,
-    roughness: 0.42,
-    clearcoat: 0.85,
-    useCarbonTexture: true,
-  },
-  neon_violet: {
-    id: 'neon_violet',
-    labelAr: 'نيون بنفسجي',
-    primaryColor: '#4c1d95',
-    secondaryColor: '#130b24',
-    wireColor: '#38bdf8',
-    conduitGlow: '#e879f9',
-    metalness: 0.82,
     roughness: 0.22,
-    clearcoat: 0.9,
-    useCarbonTexture: false,
   },
-};
-
-export interface ThrusterPreset {
-  id: ThrusterColorId;
-  labelAr: string;
-  coreHex: string;
-  outerHex: string;
-}
-
-export const THRUSTER_COLORS: Record<ThrusterColorId, ThrusterPreset> = {
-  cyan: { id: 'cyan', labelAr: 'أزرق سيبراني', coreHex: '#e0faff', outerHex: '#00d4ff' },
-  gold: { id: 'gold', labelAr: 'ذهبي ناري', coreHex: '#fffbeb', outerHex: '#f59e0b' },
-  violet: { id: 'violet', labelAr: 'بنفسجي بلازما', coreHex: '#fdf4ff', outerHex: '#c026d3' },
-  emerald: { id: 'emerald', labelAr: 'أخضر نيون', coreHex: '#ecfdf5', outerHex: '#10b981' },
+  cursed_obsidian: {
+    id: 'cursed_obsidian',
+    labelAr: 'السبج الملعون',
+    armorHex: '#12101a',
+    trimHex: '#6366f1',
+    veinHex: '#22d3ee',
+    flameCoreHex: '#e0faff',
+    flameOuterHex: '#06b6d4',
+    metalness: 0.82,
+    roughness: 0.26,
+  },
+  spectral_ivory: {
+    id: 'spectral_ivory',
+    labelAr: 'العاج الطيفي',
+    armorHex: '#d6d3d1',
+    trimHex: '#0d9488',
+    veinHex: '#5eead4',
+    flameCoreHex: '#ecfdf5',
+    flameOuterHex: '#14b8a6',
+    metalness: 0.55,
+    roughness: 0.34,
+  },
+  eternal_ember: {
+    id: 'eternal_ember',
+    labelAr: 'الجمر الأبدي',
+    armorHex: '#1c1210',
+    trimHex: '#dc2626',
+    veinHex: '#fb923c',
+    flameCoreHex: '#fff7ed',
+    flameOuterHex: '#ef4444',
+    metalness: 0.84,
+    roughness: 0.25,
+  },
 };
 
 export const DEFAULT_SETTINGS: SettingsData = {
@@ -86,7 +67,7 @@ export const DEFAULT_SETTINGS: SettingsData = {
   showFps: false,
   masterVolume: 0.85,
   sfxVolume: 0.9,
-  windVolume: 0.6,
+  windVolume: 0.65,
   muted: false,
   cameraSensitivity: 1.0,
   autoCameraFollow: true,
@@ -94,9 +75,8 @@ export const DEFAULT_SETTINGS: SettingsData = {
 
 export const DEFAULT_SAVE: SaveData = {
   bestAltitude: 0,
-  bestSummitTimeSec: null,
-  selectedSkin: 'cyber_steel',
-  selectedThruster: 'cyan',
+  bestReunionTimeSec: null,
+  selectedSkin: 'immortal_gold',
   difficulty: 'CHECKPOINTS',
   settings: DEFAULT_SETTINGS,
 };
@@ -108,18 +88,14 @@ export function loadSaveData(): SaveData {
     const parsed = JSON.parse(raw) as Partial<SaveData>;
     return {
       bestAltitude: typeof parsed.bestAltitude === 'number' ? parsed.bestAltitude : 0,
-      bestSummitTimeSec:
-        typeof parsed.bestSummitTimeSec === 'number' ? parsed.bestSummitTimeSec : null,
+      bestReunionTimeSec:
+        typeof parsed.bestReunionTimeSec === 'number' ? parsed.bestReunionTimeSec : null,
       selectedSkin:
-        parsed.selectedSkin && parsed.selectedSkin in HAND_SKINS
+        parsed.selectedSkin && parsed.selectedSkin in RELIC_SKINS
           ? parsed.selectedSkin
           : DEFAULT_SAVE.selectedSkin,
-      selectedThruster:
-        parsed.selectedThruster && parsed.selectedThruster in THRUSTER_COLORS
-          ? parsed.selectedThruster
-          : DEFAULT_SAVE.selectedThruster,
       difficulty:
-        parsed.difficulty === 'CHALLENGE' || parsed.difficulty === 'CHECKPOINTS'
+        parsed.difficulty === 'HARDCORE' || parsed.difficulty === 'CHECKPOINTS'
           ? parsed.difficulty
           : DEFAULT_SAVE.difficulty,
       settings: {
@@ -136,6 +112,6 @@ export function persistSaveData(data: SaveData): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch {
-    // Ignore quota or storage restriction errors
+    // Ignore storage quota errors
   }
 }

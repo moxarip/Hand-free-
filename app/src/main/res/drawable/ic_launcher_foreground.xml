@@ -3,6 +3,6 @@
     <item
         android:width="66dp"
         android:height="66dp"
-        android:drawable="@drawable/cyber_hand_icon"
+        android:drawable="@drawable/immortal_hand_icon"
         android:gravity="center" />
 </layer-list>

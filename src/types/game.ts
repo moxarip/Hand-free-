@@ -1,10 +1,12 @@
 export type GameState = 'SPLASH' | 'MENU' | 'PLAYING' | 'PAUSED' | 'VICTORY';
 
-export type DifficultyMode = 'CHALLENGE' | 'CHECKPOINTS';
+export type DifficultyMode = 'CHECKPOINTS' | 'HARDCORE';
 
-export type HandSkinId = 'cyber_steel' | 'gold_titanium' | 'black_carbon' | 'neon_violet';
-
-export type ThrusterColorId = 'cyan' | 'gold' | 'violet' | 'emerald';
+export type RelicSkinId =
+  | 'immortal_gold'
+  | 'cursed_obsidian'
+  | 'spectral_ivory'
+  | 'eternal_ember';
 
 export type GraphicsPreset = 'low' | 'medium' | 'high' | 'ultra';
 
@@ -12,23 +14,20 @@ export type RenderResolution = '50' | '75' | '100' | 'ultra';
 
 export type BiomeId = 1 | 2 | 3 | 4;
 
-export type SurfaceMaterialType = 'metal' | 'glass' | 'stone' | 'wood';
+export type SurfaceType = 'obsidian' | 'stone' | 'crystal' | 'gold';
 
 export type PlatformKind =
-  | 'launchpad'
-  | 'container'
-  | 'ibeam'
-  | 'plank'
-  | 'trampoline'
-  | 'island'
-  | 'moving'
-  | 'turbine_blade'
-  | 'hypercar'
-  | 'neon_rail'
-  | 'glass'
-  | 'asteroid'
-  | 'satellite'
-  | 'summit';
+  | 'shrine'
+  | 'obsidian'
+  | 'sword'
+  | 'rune_pad'
+  | 'pillar'
+  | 'elevator'
+  | 'pendulum'
+  | 'crystal'
+  | 'wind_slab'
+  | 'astral_disc'
+  | 'throne';
 
 export interface PlatformDef {
   id: number;
@@ -41,20 +40,24 @@ export interface PlatformDef {
   kind: PlatformKind;
   biome: BiomeId;
   colorHex: string;
-  accentHex?: string;
   rotY?: number;
-  // Moving / swinging platform parameters
+  // Dynamic platform motion (elevators, pendulums, orbiting discs)
   moveAxis?: 'x' | 'y' | 'z';
   moveAmp?: number;
   moveSpeed?: number;
   movePhase?: number;
-  // Rotating turbine blade parameters
-  rotCenterX?: number;
-  rotCenterZ?: number;
-  rotRadius?: number;
-  rotSpeed?: number;
-  rotAngleOffset?: number;
-  // Special interactions
+  pendulumPivotX?: number;
+  pendulumPivotY?: number;
+  pendulumPivotZ?: number;
+  pendulumLen?: number;
+  pendulumSpeed?: number;
+  pendulumMaxAngle?: number;
+  pendulumPhase?: number;
+  orbitCenterX?: number;
+  orbitCenterZ?: number;
+  orbitRadius?: number;
+  orbitSpeed?: number;
+  orbitPhase?: number;
   bounceVel?: number;
   checkpointIndex?: number;
 }
@@ -67,7 +70,7 @@ export interface CheckpointDef {
   z: number;
 }
 
-export interface GrappleAnchorDef {
+export interface SoulAnchorDef {
   id: number;
   x: number;
   y: number;
@@ -89,9 +92,8 @@ export interface SettingsData {
 
 export interface SaveData {
   bestAltitude: number;
-  bestSummitTimeSec: number | null;
-  selectedSkin: HandSkinId;
-  selectedThruster: ThrusterColorId;
+  bestReunionTimeSec: number | null;
+  selectedSkin: RelicSkinId;
   difficulty: DifficultyMode;
   settings: SettingsData;
 }
@@ -99,6 +101,7 @@ export interface SaveData {
 export interface HudDomRefs {
   altitudeEl: HTMLSpanElement | null;
   altitudeBarEl: HTMLDivElement | null;
+  distToMasterEl: HTMLSpanElement | null;
   timerEl: HTMLSpanElement | null;
   biomeEl: HTMLSpanElement | null;
   fpsEl: HTMLSpanElement | null;
@@ -109,4 +112,15 @@ export interface HudDomRefs {
   ledgeBannerEl: HTMLDivElement | null;
   fallCamBannerEl: HTMLDivElement | null;
   fallCamDistEl: HTMLSpanElement | null;
+}
+
+export interface EngineInputState {
+  moveX: number;
+  moveY: number;
+  camYaw: number;
+  camPitch: number;
+  jumpPressed: boolean;
+  jumpJustPressed: boolean;
+  dashJustPressed: boolean;
+  grappleJustPressed: boolean;
 }

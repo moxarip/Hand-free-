@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "Sky Ascent 3D"
+rootProject.name = "Immortal Hand 3D"
 
 include(":app")

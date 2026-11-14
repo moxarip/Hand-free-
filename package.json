@@ -1,5 +1,5 @@
 {
-  "name": "sky-ascent-3d",
+  "name": "immortal-hand-3d",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@capacitor/core": "^6.2.0",
-    "@react-three/drei": "^9.117.3",
-    "@react-three/fiber": "^8.17.10",
     "lucide-react": "^0.460.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

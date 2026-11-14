@@ -1,6 +1,6 @@
 {
-  "name": "Sky Ascent 3D",
-  "description": "الصعود المستحيل 3D — لعبة تسلق باركور ثلاثية الأبعاد ببطولة يد سايبرانية مفصلية عبر 1000 متر من البيئات السماوية والفضائية.",
+  "name": "Immortal Hand 3D",
+  "description": "اليد الخالدة: رحلة العودة — مغامرة باركور ثلاثية الأبعاد ببطولة يد خالدة مقطوعة تتسلق 1000 متر من أطلال العالم الآخر نحو عرش الخلود.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

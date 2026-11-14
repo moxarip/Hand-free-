@@ -35,7 +35,7 @@ jobs:
 
       - name: Install dependencies and build web bundle
         run: |
-          npm ci
+          npm install
           npm run build
 
       - name: Sync web assets to Android & Capacitor

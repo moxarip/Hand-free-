@@ -2,10 +2,16 @@ package com.example
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.webkit.ConsoleMessage
+import android.webkit.RenderProcessGoneDetail
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
@@ -28,6 +34,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import java.io.ByteArrayInputStream
 import java.io.IOException
 
 class MainActivity : ComponentActivity() {
@@ -39,11 +46,15 @@ class MainActivity : ComponentActivity() {
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     configureImmersiveMode()
 
+    if (BuildConfig.DEBUG) {
+      WebView.setWebContentsDebuggingEnabled(true)
+    }
+
     setContent {
       Box(
         modifier = Modifier
           .fillMaxSize()
-          .background(ComposeColor(0xFF070B14))
+          .background(ComposeColor(0xFF0B0914))
       ) {
         GameWebView(
           onWebViewReady = { webView -> gameWebView = webView },
@@ -107,8 +118,8 @@ private fun GameWebView(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.MATCH_PARENT
       )
-      setBackgroundColor(Color.parseColor("#070B14"))
-      setLayerType(View.LAYER_TYPE_HARDWARE, null)
+      setBackgroundColor(Color.parseColor("#0B0914"))
+      // Use default LAYER_TYPE_NONE so Chromium's GPU/WebGL Surface composites natively
       isFocusable = true
       isFocusableInTouchMode = true
       overScrollMode = View.OVER_SCROLL_NEVER
@@ -121,10 +132,24 @@ private fun GameWebView(
         allowFileAccess = true
         useWideViewPort = true
         loadWithOverviewMode = true
-        cacheMode = WebSettings.LOAD_DEFAULT
+        cacheMode = WebSettings.LOAD_NO_CACHE
         setSupportZoom(false)
         builtInZoomControls = false
         displayZoomControls = false
+      }
+
+      clearCache(true)
+
+      webChromeClient = object : WebChromeClient() {
+        override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+          if (consoleMessage != null) {
+            Log.d(
+              "ImmortalHandWV",
+              "[${consoleMessage.messageLevel()}] ${consoleMessage.message()} (${consoleMessage.sourceId()}:${consoleMessage.lineNumber()})"
+            )
+          }
+          return true
+        }
       }
 
       webViewClient = object : WebViewClient() {
@@ -145,16 +170,47 @@ private fun GameWebView(
               "UTF-8",
               200,
               "OK",
-              mapOf("Access-Control-Allow-Origin" to "*"),
+              mapOf(
+                "Access-Control-Allow-Origin" to "*",
+                "Cache-Control" to "no-store"
+              ),
               stream
             )
           } catch (_: IOException) {
-            null
+            WebResourceResponse(
+              "text/plain",
+              "UTF-8",
+              404,
+              "Not Found",
+              mapOf("Access-Control-Allow-Origin" to "*"),
+              ByteArrayInputStream(ByteArray(0))
+            )
           }
+        }
+
+        override fun onReceivedError(
+          view: WebView?,
+          request: WebResourceRequest?,
+          error: WebResourceError?
+        ) {
+          Log.e(
+            "ImmortalHandWV",
+            "WebView error ${error?.errorCode}: ${error?.description} for ${request?.url}"
+          )
+        }
+
+        override fun onRenderProcessGone(
+          view: WebView?,
+          detail: RenderProcessGoneDetail?
+        ): Boolean {
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.e("ImmortalHandWV", "RenderProcessGone didCrash=${detail?.didCrash()}")
+          }
+          view?.loadUrl("https://appassets.androidplatform.net/index.html")
+          return true
         }
       }
 
-      loadUrl("https://appassets.androidplatform.net/index.html")
       onWebViewReady(this)
     }
   }
@@ -166,7 +222,12 @@ private fun GameWebView(
   }
 
   AndroidView(
-    factory = { webView },
+    factory = {
+      if (webView.url == null) {
+        webView.loadUrl("https://appassets.androidplatform.net/index.html")
+      }
+      webView
+    },
     modifier = Modifier.fillMaxSize()
   )
 }

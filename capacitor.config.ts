@@ -1,15 +1,15 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.skyascent.cyberhand3d',
-  appName: 'Sky Ascent 3D',
+  appId: 'com.immortalhand.otherworld3d',
+  appName: 'Immortal Hand 3D',
   webDir: 'dist',
   server: {
     androidScheme: 'https',
   },
   android: {
     allowMixedContent: false,
-    backgroundColor: '#070B14',
+    backgroundColor: '#0B0914',
     webContentsDebuggingEnabled: false,
   },
 };
